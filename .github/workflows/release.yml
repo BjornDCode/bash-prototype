@@ -1,0 +1,81 @@
+name: Release
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - target: darwin-arm64
+            os: macos-latest
+            arch: aarch64-apple-darwin
+          - target: darwin-x64
+            os: macos-latest
+            arch: x86_64-apple-darwin
+          - target: linux-x64
+            os: ubuntu-latest
+            arch: x86_64-unknown-linux-gnu
+          - target: windows-x64
+            os: windows-latest
+            arch: x86_64-pc-windows-gnu
+
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+
+      # Build your CLI binary
+      - run: bun build --compile --target bun-${{ matrix.arch }} --outfile pincher src/index.ts
+
+      # Download platform-specific pngquant binary
+      - name: Download pngquant
+        run: |
+          mkdir -p release/bin release/lib
+
+          # Move your binary
+          mv pincher* release/bin/
+
+          # Download appropriate pngquant
+          case "${{ matrix.target }}" in
+            darwin-arm64)
+              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-darwin-arm64" -o release/lib/pngquant
+              ;;
+            darwin-x64)
+              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-darwin-x64" -o release/lib/pngquant
+              ;;
+            linux-x64)
+              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-linux-x64" -o release/lib/pngquant
+              ;;
+            windows-x64)
+              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-windows.exe" -o release/lib/pngquant.exe
+              ;;
+          esac
+
+          chmod +x release/lib/pngquant*
+
+      # Create platform-specific ZIP
+      - name: Create ZIP
+        run: |
+          cd release
+          zip -r ../pincher-${{ matrix.target }}.zip .
+
+      # Upload as artifact
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pincher-${{ matrix.target }}
+          path: pincher-${{ matrix.target }}.zip
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            pincher-*/pincher-*.zip
+          generate_release_notes: true
