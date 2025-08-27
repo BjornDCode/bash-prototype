@@ -42,15 +42,15 @@ jobs:
             darwin-arm64)
               curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-darwin-arm64" -o release/lib/pngquant
               ;;
-            darwin-x64)
-              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-darwin-x64" -o release/lib/pngquant
-              ;;
-            linux-x64)
-              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-linux-x64" -o release/lib/pngquant
-              ;;
-            windows-x64)
-              curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-windows.exe" -o release/lib/pngquant.exe
-              ;;
+            # darwin-x64)
+            #   curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-darwin-x64" -o release/lib/pngquant
+            #   ;;
+            # linux-x64)
+            #   curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-linux-x64" -o release/lib/pngquant
+            #   ;;
+            # windows-x64)
+            #   curl -L "https://github.com/kornelski/pngquant/releases/latest/download/pngquant-windows.exe" -o release/lib/pngquant.exe
+            #   ;;
           esac
 
           chmod +x release/lib/pngquant*
