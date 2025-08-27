@@ -27,7 +27,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       # Build your CLI binary
-      - run: bun build --compile --target bun-${{ matrix.arch }} --outfile pincher src/index.ts
+      - run: bun build --compile --target bun-${{ matrix.arch }} --outfile pincher index.ts
 
       # Download platform-specific pngquant binary
       - name: Download pngquant
